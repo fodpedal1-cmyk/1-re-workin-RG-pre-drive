@@ -1,4 +1,6 @@
+#include "PluginProcessor.h"
 #include "PluginEditor.h"
+
 #include <cmath>
 
 //==============================================================
@@ -12,6 +14,257 @@ namespace
 
     constexpr float knobEndAngle =
         juce::MathConstants<float>::pi * 7.0f / 3.0f;
+
+    //==========================================================
+    // PEDAL BODY — UNCHANGED
+    //==========================================================
+
+    constexpr float pedalX = 70.0f;
+    constexpr float pedalY = 25.0f;
+    constexpr float pedalW = 460.0f;
+    constexpr float pedalH = 610.0f;
+
+    constexpr float pedalRight =
+        pedalX + pedalW;
+
+    constexpr float pedalBottom =
+        pedalY + pedalH;
+
+    constexpr float pedalCentreX =
+        pedalX + pedalW * 0.5f;
+
+    //==========================================================
+    // CACHED ORANGE-PEEL TEXTURE
+    //==========================================================
+
+    juce::Image orangePeelTexture;
+
+    void createOrangePeelTexture(
+        int width,
+        int height)
+    {
+        orangePeelTexture = juce::Image(
+            juce::Image::ARGB,
+            width,
+            height,
+            true);
+
+        juce::Graphics tg(
+            orangePeelTexture);
+
+        juce::Random r(
+            0x7A31C9E5);
+
+        //======================================================
+        // DEEP POWDER-COAT VALLEYS
+        //======================================================
+
+        for (int i = 0; i < 9000; ++i)
+        {
+            const float x =
+                r.nextFloat()
+                * static_cast<float>(width);
+
+            const float y =
+                r.nextFloat()
+                * static_cast<float>(height);
+
+            const float rx =
+                0.70f
+                + r.nextFloat() * 1.35f;
+
+            const float ry =
+                0.55f
+                + r.nextFloat() * 1.15f;
+
+            const float rotation =
+                r.nextFloat()
+                * juce::MathConstants<float>::twoPi;
+
+            juce::Path pit;
+
+            constexpr int points = 6;
+
+            for (int p = 0;
+                 p < points;
+                 ++p)
+            {
+                const float angle =
+                    (static_cast<float>(p)
+                     / static_cast<float>(points))
+                    * juce::MathConstants<float>::twoPi;
+
+                const float irregular =
+                    0.65f
+                    + r.nextFloat() * 0.55f;
+
+                const float px =
+                    std::cos(angle)
+                    * rx
+                    * irregular;
+
+                const float py =
+                    std::sin(angle)
+                    * ry
+                    * irregular;
+
+                const float c =
+                    std::cos(rotation);
+
+                const float s =
+                    std::sin(rotation);
+
+                const float finalX =
+                    x + px * c - py * s;
+
+                const float finalY =
+                    y + px * s + py * c;
+
+                if (p == 0)
+                    pit.startNewSubPath(
+                        finalX,
+                        finalY);
+                else
+                    pit.lineTo(
+                        finalX,
+                        finalY);
+            }
+
+            pit.closeSubPath();
+
+            tg.setColour(
+                juce::Colour(0xff000000)
+                    .withAlpha(0.20f));
+
+            tg.fillPath(pit);
+        }
+
+        //======================================================
+        // RAISED BUMPS
+        //======================================================
+
+        for (int i = 0; i < 7500; ++i)
+        {
+            const float x =
+                r.nextFloat()
+                * static_cast<float>(width);
+
+            const float y =
+                r.nextFloat()
+                * static_cast<float>(height);
+
+            const float rx =
+                0.65f
+                + r.nextFloat() * 1.45f;
+
+            const float ry =
+                0.50f
+                + r.nextFloat() * 1.20f;
+
+            const float rotation =
+                r.nextFloat()
+                * juce::MathConstants<float>::twoPi;
+
+            juce::Path bump;
+
+            constexpr int points = 7;
+
+            for (int p = 0;
+                 p < points;
+                 ++p)
+            {
+                const float angle =
+                    (static_cast<float>(p)
+                     / static_cast<float>(points))
+                    * juce::MathConstants<float>::twoPi;
+
+                const float irregular =
+                    0.70f
+                    + r.nextFloat() * 0.50f;
+
+                const float px =
+                    std::cos(angle)
+                    * rx
+                    * irregular;
+
+                const float py =
+                    std::sin(angle)
+                    * ry
+                    * irregular;
+
+                const float c =
+                    std::cos(rotation);
+
+                const float s =
+                    std::sin(rotation);
+
+                const float finalX =
+                    x + px * c - py * s;
+
+                const float finalY =
+                    y + px * s + py * c;
+
+                if (p == 0)
+                    bump.startNewSubPath(
+                        finalX,
+                        finalY);
+                else
+                    bump.lineTo(
+                        finalX,
+                        finalY);
+            }
+
+            bump.closeSubPath();
+
+            tg.setColour(
+                juce::Colour(0xffB8BDC0)
+                    .withAlpha(0.105f));
+
+            tg.fillPath(bump);
+        }
+
+        //======================================================
+        // MICRO RELIEF
+        //======================================================
+
+        for (int i = 0; i < 4500; ++i)
+        {
+            const float x =
+                r.nextFloat()
+                * static_cast<float>(width);
+
+            const float y =
+                r.nextFloat()
+                * static_cast<float>(height);
+
+            const float rx =
+                0.25f
+                + r.nextFloat() * 0.70f;
+
+            const float ry =
+                0.20f
+                + r.nextFloat() * 0.60f;
+
+            if (r.nextBool())
+            {
+                tg.setColour(
+                    juce::Colour(0xffD0D4D6)
+                        .withAlpha(0.075f));
+            }
+            else
+            {
+                tg.setColour(
+                    juce::Colour(0xff000000)
+                        .withAlpha(0.075f));
+            }
+
+            tg.fillEllipse(
+                x - rx,
+                y - ry,
+                rx * 2.0f,
+                ry * 2.0f);
+        }
+    }
 }
 
 //==============================================================
@@ -20,173 +273,198 @@ namespace
 
 RG_Precision_DriveAudioProcessorEditor::PedalKnob::PedalKnob()
 {
-    setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    setSliderStyle(
+        juce::Slider::RotaryHorizontalVerticalDrag);
 
-    setRange(0.0, 1.0, 0.001);
+    setTextBoxStyle(
+        juce::Slider::NoTextBox,
+        false,
+        0,
+        0);
+
+    setRange(
+        0.0,
+        1.0,
+        0.001);
+
     setRotaryParameters(
         knobStartAngle,
         knobEndAngle,
         true);
 
-    setMouseDragSensitivity(180);
-
-    setColour(
-        juce::Slider::rotarySliderFillColourId,
-        juce::Colours::transparentBlack);
-
-    setColour(
-        juce::Slider::rotarySliderOutlineColourId,
-        juce::Colours::transparentBlack);
-
-    setColour(
-        juce::Slider::thumbColourId,
-        juce::Colours::transparentBlack);
+    setDoubleClickReturnValue(
+        true,
+        0.5);
 }
 
 //==============================================================
-// KNOB PAINT
+// PEDAL KNOB PAINT
 //==============================================================
 
 void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
     juce::Graphics& g)
 {
-    const auto bounds =
+    auto bounds =
         getLocalBounds().toFloat();
 
-    const float cx = bounds.getCentreX();
-    const float cy = bounds.getCentreY();
+    const float diameter =
+        juce::jmin(
+            bounds.getWidth(),
+            bounds.getHeight())
+        - 10.0f;
 
-    const bool smallKnob =
-        getWidth() <= 55;
+    const float x =
+        bounds.getCentreX()
+        - diameter * 0.5f;
 
-    const float radius =
-        juce::jmin(bounds.getWidth(),
-                   bounds.getHeight()) * 0.5f
-        - 2.0f;
+    const float y =
+        bounds.getCentreY()
+        - diameter * 0.5f;
 
-    if (smallKnob)
-    {
-        juce::ColourGradient crystal(
-            juce::Colours::white.withAlpha(0.30f),
-            cx - radius * 0.7f,
-            cy - radius * 0.8f,
+    juce::Rectangle<float> knobBounds(
+        x,
+        y,
+        diameter,
+        diameter);
 
-            juce::Colours::lightgrey.withAlpha(0.07f),
-            cx + radius,
-            cy + radius,
-            true);
+    const float centreX =
+        knobBounds.getCentreX();
 
-        g.setGradientFill(crystal);
+    const float centreY =
+        knobBounds.getCentreY();
 
-        g.fillEllipse(
-            cx - radius,
-            cy - radius,
-            radius * 2.0f,
-            radius * 2.0f);
+    //==========================================================
+    // SHADOW
+    //==========================================================
 
-        g.setColour(
-            juce::Colours::white.withAlpha(0.75f));
-
-        g.drawEllipse(
-            cx - radius,
-            cy - radius,
-            radius * 2.0f,
-            radius * 2.0f,
-            1.4f);
-
-        g.setColour(
-            juce::Colours::white.withAlpha(0.22f));
-
-        g.fillEllipse(
-            cx - radius * 0.58f,
-            cy - radius * 0.58f,
-            radius * 1.16f,
-            radius * 1.16f);
-
-        const float value =
-            (float)getValue();
-
-        const float angle =
-            knobStartAngle
-            + value * (knobEndAngle - knobStartAngle);
-
-        const float pointerLength =
-            radius * 0.72f;
-
-        g.setColour(
-            juce::Colours::white.withAlpha(0.95f));
-
-        g.drawLine(
-            cx,
-            cy,
-            cx + std::cos(angle) * pointerLength,
-            cy + std::sin(angle) * pointerLength,
-            2.0f);
-
-        return;
-    }
-
-    juce::ColourGradient metal(
-        juce::Colours::grey.brighter(0.55f),
-        cx - radius,
-        cy - radius,
-
-        juce::Colours::black,
-        cx + radius,
-        cy + radius,
-        true);
-
-    g.setGradientFill(metal);
+    g.setColour(
+        juce::Colour(0x90000000));
 
     g.fillEllipse(
-        cx - radius,
-        cy - radius,
-        radius * 2.0f,
-        radius * 2.0f);
+        knobBounds.expanded(4.0f));
+
+    //==========================================================
+    // OUTER BLACK BODY
+    //==========================================================
+
+    juce::ColourGradient glossGradient(
+        juce::Colour(0xff555555),
+        knobBounds.getX(),
+        knobBounds.getY(),
+        juce::Colour(0xff050505),
+        knobBounds.getRight(),
+        knobBounds.getBottom(),
+        true);
+
+    g.setGradientFill(
+        glossGradient);
+
+    g.fillEllipse(
+        knobBounds);
+
+    //==========================================================
+    // DARK EDGE
+    //==========================================================
 
     g.setColour(
-        juce::Colours::black);
+        juce::Colour(0xff020202));
 
     g.drawEllipse(
-        cx - radius,
-        cy - radius,
-        radius * 2.0f,
-        radius * 2.0f,
+        knobBounds,
         2.0f);
 
-    const float innerRadius =
-        radius * 0.78f;
+    //==========================================================
+    // INNER BLACK PLASTIC
+    //==========================================================
 
-    g.setColour(
-        juce::Colours::white.withAlpha(0.10f));
+    auto innerBounds =
+        knobBounds.reduced(5.0f);
 
-    g.drawEllipse(
-        cx - innerRadius,
-        cy - innerRadius,
-        innerRadius * 2.0f,
-        innerRadius * 2.0f,
-        1.2f);
+    juce::ColourGradient bodyGradient(
+        juce::Colour(0xff292929),
+        innerBounds.getX(),
+        innerBounds.getY(),
+        juce::Colour(0xff070707),
+        innerBounds.getRight(),
+        innerBounds.getBottom(),
+        true);
 
-    const float value =
-        (float)getValue();
+    g.setGradientFill(
+        bodyGradient);
+
+    g.fillEllipse(
+        innerBounds);
+
+    //==========================================================
+    // POINTER
+    //==========================================================
+
+    auto range =
+        getNormalisableRange();
+
+    const float normalized =
+        (float) range.convertTo0to1(
+            getValue());
 
     const float angle =
         knobStartAngle
-        + value * (knobEndAngle - knobStartAngle);
+        + normalized
+        * (knobEndAngle
+           - knobStartAngle);
+
+    const float pointerStart =
+        diameter * 0.08f;
 
     const float pointerLength =
-        radius * 0.70f;
+        diameter * 0.38f;
+
+    const float startX =
+        centreX
+        + std::cos(angle)
+        * pointerStart;
+
+    const float startY =
+        centreY
+        + std::sin(angle)
+        * pointerStart;
+
+    const float endX =
+        centreX
+        + std::cos(angle)
+        * pointerLength;
+
+    const float endY =
+        centreY
+        + std::sin(angle)
+        * pointerLength;
+
+    //==========================================================
+    // POINTER SHADOW
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0x90000000));
+
+    g.drawLine(
+        startX + 1.0f,
+        startY + 1.0f,
+        endX + 1.0f,
+        endY + 1.0f,
+        5.0f);
+
+    //==========================================================
+    // WHITE POINTER
+    //==========================================================
 
     g.setColour(
         juce::Colours::white);
 
     g.drawLine(
-        cx,
-        cy,
-        cx + std::cos(angle) * pointerLength,
-        cy + std::sin(angle) * pointerLength,
-        2.5f);
+        startX,
+        startY,
+        endX,
+        endY,
+        3.5f);
 }
 
 //==============================================================
@@ -199,51 +477,106 @@ RG_Precision_DriveAudioProcessorEditor(
     : AudioProcessorEditor(&p),
       audioProcessor(p)
 {
-    setSize(600, 660);
-    setResizable(false, false);
+    //==========================================================
+    // EXACT EDITOR SIZE — UNCHANGED
+    //==========================================================
+
+    setSize(
+        600,
+        660);
+
+    setResizable(
+        false,
+        false);
+
+    //==========================================================
+    // VOLUME
+    //==========================================================
 
     setupKnob(
         volumeKnob,
         juce::Slider::RotaryHorizontalVerticalDrag);
 
+    setupLabel(
+        volumeLabel,
+        "VOLUME");
+
+    //==========================================================
+    // BRIGHT
+    //==========================================================
+
     setupKnob(
         brightKnob,
         juce::Slider::RotaryHorizontalVerticalDrag);
+
+    setupLabel(
+        brightLabel,
+        "BRIGHT");
+
+    //==========================================================
+    // ATTACK
+    //==========================================================
 
     setupKnob(
         attackKnob,
         juce::Slider::RotaryHorizontalVerticalDrag,
         true);
 
+    setupLabel(
+        attackLabel,
+        "ATTACK");
+
+    //==========================================================
+    // DRIVE
+    //==========================================================
+
     setupKnob(
         driveKnob,
         juce::Slider::RotaryHorizontalVerticalDrag);
+
+    setupLabel(
+        driveLabel,
+        "DRIVE");
+
+    //==========================================================
+    // GATE
+    //==========================================================
 
     setupKnob(
         gateKnob,
         juce::Slider::RotaryHorizontalVerticalDrag);
 
-    setupLabel(volumeLabel, "VOLUME");
-    setupLabel(brightLabel, "BRIGHT");
-    setupLabel(attackLabel, "ATTACK");
-    setupLabel(driveLabel, "DRIVE");
-    setupLabel(gateLabel, "GATE");
+    setupLabel(
+        gateLabel,
+        "GATE");
 
-    bypassButton.setButtonText({});
+    //==========================================================
+    // FOOTSWITCH
+    //==========================================================
+
+    bypassButton.setButtonText("");
+
     bypassButton.setClickingTogglesState(true);
-    bypassButton.setAlpha(0.001f);
 
-    bypassButton.onStateChange =
-        [this]
-        {
-            footswitchPressed =
-                bypassButton.getToggleState();
+    bypassButton.setColour(
+        juce::ToggleButton::textColourId,
+        juce::Colours::transparentBlack);
 
-            updateLED();
-            repaint();
-        };
+    bypassButton.setColour(
+        juce::ToggleButton::tickColourId,
+        juce::Colours::transparentBlack);
 
-    addAndMakeVisible(bypassButton);
+    bypassButton.setAlpha(
+        0.001f);
+
+    addAndMakeVisible(
+        bypassButton);
+
+    led.setVisible(false);
+
+    //==========================================================
+    // PARAMETER ATTACHMENTS
+    //==========================================================
 
     volumeAttachment =
         std::make_unique<
@@ -287,15 +620,9 @@ RG_Precision_DriveAudioProcessorEditor(
                 "BYPASS",
                 bypassButton);
 
-    led.setText(
-        {},
-        juce::dontSendNotification);
-
-    led.setColour(
-        juce::Label::backgroundColourId,
-        juce::Colours::transparentBlack);
-
-    addAndMakeVisible(led);
+    //==========================================================
+    // TIMER
+    //==========================================================
 
     startTimerHz(30);
 }
@@ -327,6 +654,11 @@ void RG_Precision_DriveAudioProcessorEditor::setupKnob(
         0,
         0);
 
+    knob.setRotaryParameters(
+        knobStartAngle,
+        knobEndAngle,
+        true);
+
     if (selector)
     {
         knob.setRange(
@@ -334,7 +666,8 @@ void RG_Precision_DriveAudioProcessorEditor::setupKnob(
             6.0,
             1.0);
 
-        knob.setNumDecimalPlacesToDisplay(0);
+        knob.setNumDecimalPlacesToDisplay(
+            0);
     }
     else
     {
@@ -344,7 +677,8 @@ void RG_Precision_DriveAudioProcessorEditor::setupKnob(
             0.001);
     }
 
-    addAndMakeVisible(knob);
+    addAndMakeVisible(
+        knob);
 }
 
 //==============================================================
@@ -359,24 +693,24 @@ void RG_Precision_DriveAudioProcessorEditor::setupLabel(
         text,
         juce::dontSendNotification);
 
+    label.setJustificationType(
+        juce::Justification::centred);
+
     label.setFont(
         juce::Font(
-            "Arial",
-            11.0f,
+            13.0f,
             juce::Font::bold));
 
     label.setColour(
         juce::Label::textColourId,
-        juce::Colours::white.withAlpha(0.92f));
+        juce::Colour(0xff2494ff));
 
-    label.setJustificationType(
-        juce::Justification::centred);
+    label.setColour(
+        juce::Label::backgroundColourId,
+        juce::Colours::transparentBlack);
 
-    label.setInterceptsMouseClicks(
-        false,
-        false);
-
-    addAndMakeVisible(label);
+    addAndMakeVisible(
+        label);
 }
 
 //==============================================================
@@ -385,115 +719,164 @@ void RG_Precision_DriveAudioProcessorEditor::setupLabel(
 
 void RG_Precision_DriveAudioProcessorEditor::resized()
 {
-    const float editorW =
-        (float)getWidth();
+    //==========================================================
+    // PEDAL BODY — UNCHANGED
+    //
+    // 600 x 660 editor
+    // 460 x 610 pedal
+    //
+    // left/right black margin = 70
+    // top/bottom black margin = 25
+    //==========================================================
 
-    const float editorH =
-        (float)getHeight();
-
-    const float pedalW = 350.0f;
-    const float pedalH = 590.0f;
-
-    const float pedalX =
-        (editorW - pedalW) * 0.5f;
-
-    const float pedalY =
-        (editorH - pedalH) * 0.5f;
-
-    const float centerX =
-        pedalX + pedalW * 0.5f;
-
-    const float leftX =
-        pedalX + pedalW * 0.285f;
-
-    const float rightX =
-        pedalX + pedalW * 0.715f;
-
-    const int topSize = 78;
-
-    volumeKnob.setBounds(
-        juce::roundToInt(leftX - topSize * 0.5f),
-        juce::roundToInt(pedalY + 70.0f),
-        topSize,
-        topSize);
-
-    brightKnob.setBounds(
-        juce::roundToInt(rightX - topSize * 0.5f),
-        juce::roundToInt(pedalY + 70.0f),
-        topSize,
-        topSize);
+    //==========================================================
+    // TOP ROW — MOVED UP
+    //==========================================================
 
     volumeLabel.setBounds(
-        juce::roundToInt(leftX - 48.0f),
-        juce::roundToInt(pedalY + 148.0f),
-        96,
-        20);
+        108,
+        40,
+        125,
+        22);
+
+    volumeKnob.setBounds(
+        110,
+        61,
+        120,
+        120);
 
     brightLabel.setBounds(
-        juce::roundToInt(rightX - 48.0f),
-        juce::roundToInt(pedalY + 148.0f),
-        96,
-        20);
+        367,
+        40,
+        125,
+        22);
 
-    const int mainSize = 72;
+    brightKnob.setBounds(
+        370,
+        61,
+        120,
+        120);
 
-    attackKnob.setBounds(
-        juce::roundToInt(leftX - mainSize * 0.5f),
-        juce::roundToInt(pedalY + 170.0f),
-        mainSize,
-        mainSize);
-
-    driveKnob.setBounds(
-        juce::roundToInt(rightX - mainSize * 0.5f),
-        juce::roundToInt(pedalY + 170.0f),
-        mainSize,
-        mainSize);
-
-    const int gateSize = 50;
-
-    gateKnob.setBounds(
-        juce::roundToInt(centerX - gateSize * 0.5f),
-        juce::roundToInt(pedalY + 181.0f),
-        gateSize,
-        gateSize);
+    //==========================================================
+    // MIDDLE ROW — MOVED UP
+    //==========================================================
 
     attackLabel.setBounds(
-        juce::roundToInt(leftX - 48.0f),
-        juce::roundToInt(pedalY + 242.0f),
-        96,
-        20);
+        92,
+        175,
+        135,
+        22);
+
+    attackKnob.setBounds(
+        100,
+        196,
+        120,
+        120);
+
+    //==========================================================
+    // SMALL GATE — MOVED UP
+    //==========================================================
+
+    gateKnob.setBounds(
+        272,
+        220,
+        58,
+        58);
 
     gateLabel.setBounds(
-        juce::roundToInt(centerX - 42.0f),
-        juce::roundToInt(pedalY + 232.0f),
-        84,
-        20);
+        250,
+        280,
+        102,
+        22);
+
+    //==========================================================
+    // DRIVE — MOVED UP
+    //==========================================================
 
     driveLabel.setBounds(
-        juce::roundToInt(rightX - 48.0f),
-        juce::roundToInt(pedalY + 242.0f),
-        96,
-        20);
+        373,
+        175,
+        135,
+        22);
+
+    driveKnob.setBounds(
+        380,
+        196,
+        120,
+        120);
+
+    //==========================================================
+    // FOOTSWITCH HIT AREA — UNCHANGED
+    //==========================================================
 
     bypassButton.setBounds(
-        juce::roundToInt(centerX - 65.0f),
-        juce::roundToInt(pedalY + 415.0f),
+        235,
+        540,
         130,
-        115);
-
-    led.setBounds(
-        juce::roundToInt(centerX - 16.0f),
-        juce::roundToInt(pedalY + 338.0f),
-        32,
-        32);
+        95);
 }
 
 //==============================================================
-// LED STATE
+// UPDATE LED / GATE GLOW
 //==============================================================
 
 void RG_Precision_DriveAudioProcessorEditor::updateLED()
 {
+    const float target =
+        juce::jlimit(
+            0.0f,
+            1.0f,
+            audioProcessor.getOutputLevel());
+
+    if (target > gateGlowLevel)
+    {
+        gateGlowLevel +=
+            (target - gateGlowLevel)
+            * 0.40f;
+    }
+    else
+    {
+        gateGlowLevel +=
+            (target - gateGlowLevel)
+            * 0.12f;
+    }
+
+    if (gateGlowLevel < 0.0005f)
+        gateGlowLevel = 0.0f;
+
+    repaint();
+}
+
+//==============================================================
+// TIMER
+//==============================================================
+
+void RG_Precision_DriveAudioProcessorEditor::timerCallback()
+{
+    updateLED();
+}
+
+//==============================================================
+// MOUSE DOWN
+//==============================================================
+
+void RG_Precision_DriveAudioProcessorEditor::mouseDown(
+    const juce::MouseEvent&)
+{
+    footswitchPressed = true;
+
+    repaint();
+}
+
+//==============================================================
+// MOUSE UP
+//==============================================================
+
+void RG_Precision_DriveAudioProcessorEditor::mouseUp(
+    const juce::MouseEvent&)
+{
+    footswitchPressed = false;
+
     repaint();
 }
 
@@ -504,399 +887,539 @@ void RG_Precision_DriveAudioProcessorEditor::updateLED()
 void RG_Precision_DriveAudioProcessorEditor::paint(
     juce::Graphics& g)
 {
+    //==========================================================
+    // PURE BLACK OUTSIDE THE PEDAL
+    //==========================================================
+
     g.fillAll(
-        juce::Colour(18, 18, 18));
+        juce::Colours::black);
 
-    const float editorW =
-        (float)getWidth();
-
-    const float editorH =
-        (float)getHeight();
-
-    const float pedalW = 350.0f;
-    const float pedalH = 590.0f;
-
-    const float pedalX =
-        (editorW - pedalW) * 0.5f;
-
-    const float pedalY =
-        (editorH - pedalH) * 0.5f;
-
-    //==========================================================
-    // FIX: CENTER X
-    //==========================================================
-
-    const float centerX =
-        pedalX + pedalW * 0.5f;
-
-    //==========================================================
-    // PEDAL SHADOW
-    //==========================================================
-
-    g.setColour(
-        juce::Colours::black.withAlpha(0.65f));
-
-    g.fillRoundedRectangle(
-        pedalX + 5.0f,
-        pedalY + 7.0f,
-        pedalW,
-        pedalH,
-        9.0f);
-
-    //==========================================================
-    // POWDER-COAT BODY
-    //==========================================================
-
-    juce::ColourGradient bodyGradient(
-        juce::Colour(52, 52, 52),
+    juce::Rectangle<float> pedalArea(
         pedalX,
         pedalY,
+        pedalW,
+        pedalH);
 
-        juce::Colour(20, 20, 20),
-        pedalX + pedalW,
-        pedalY + pedalH,
+    //==========================================================
+    // PEDAL BODY GRADIENT
+    //==========================================================
+
+    juce::ColourGradient backgroundGradient(
+        juce::Colour(0xff292B2D),
+        pedalArea.getX(),
+        pedalArea.getY(),
+        juce::Colour(0xff090A0B),
+        pedalArea.getRight(),
+        pedalArea.getBottom(),
         false);
 
-    g.setGradientFill(bodyGradient);
+    g.setGradientFill(
+        backgroundGradient);
 
     g.fillRoundedRectangle(
-        pedalX,
-        pedalY,
-        pedalW,
-        pedalH,
-        8.0f);
+        pedalArea,
+        18.0f);
 
     //==========================================================
-    // ROUGH POWDER-COAT TEXTURE
+    // ORANGE-PEEL TEXTURE
     //==========================================================
 
-    juce::Random textureRandom(0x7A31C9E5);
+    const int textureWidth =
+        static_cast<int>(pedalW);
+
+    const int textureHeight =
+        static_cast<int>(pedalH);
+
+    if (orangePeelTexture.isNull()
+        || orangePeelTexture.getWidth()
+            != textureWidth
+        || orangePeelTexture.getHeight()
+            != textureHeight)
+    {
+        createOrangePeelTexture(
+            textureWidth,
+            textureHeight);
+    }
 
     g.saveState();
+
+    juce::Path textureClip;
+
+    textureClip.addRoundedRectangle(
+        pedalArea,
+        18.0f);
 
     g.reduceClipRegion(
-        juce::Rectangle<int>(
-            juce::roundToInt(pedalX + 3.0f),
-            juce::roundToInt(pedalY + 3.0f),
-            juce::roundToInt(pedalW - 6.0f),
-            juce::roundToInt(pedalH - 6.0f)));
+        textureClip);
 
-    for (int i = 0; i < 1200; ++i)
-    {
-        const float x =
-            pedalX + textureRandom.nextFloat() * pedalW;
-
-        const float y =
-            pedalY + textureRandom.nextFloat() * pedalH;
-
-        const float r =
-            0.3f + textureRandom.nextFloat() * 1.3f;
-
-        g.setColour(
-            juce::Colours::black.withAlpha(
-                0.08f + textureRandom.nextFloat() * 0.12f));
-
-        g.fillEllipse(
-            x,
-            y,
-            r,
-            r);
-    }
-
-    for (int i = 0; i < 1400; ++i)
-    {
-        const float x =
-            pedalX + textureRandom.nextFloat() * pedalW;
-
-        const float y =
-            pedalY + textureRandom.nextFloat() * pedalH;
-
-        const float r =
-            0.25f + textureRandom.nextFloat() * 1.0f;
-
-        g.setColour(
-            juce::Colours::white.withAlpha(
-                0.025f + textureRandom.nextFloat() * 0.055f));
-
-        g.fillEllipse(
-            x,
-            y,
-            r,
-            r);
-    }
+    g.drawImageAt(
+        orangePeelTexture,
+        static_cast<int>(pedalX),
+        static_cast<int>(pedalY));
 
     g.restoreState();
 
     //==========================================================
-    // BODY EDGE
+    // OUTER EDGE
     //==========================================================
 
     g.setColour(
-        juce::Colours::black.withAlpha(0.9f));
+        juce::Colour(0xff4A4F54));
 
     g.drawRoundedRectangle(
-        pedalX,
-        pedalY,
-        pedalW,
-        pedalH,
-        8.0f,
-        2.0f);
+        pedalArea,
+        18.0f,
+        3.0f);
 
     //==========================================================
-    // SIDE LABELS
-    //==========================================================
-
-    g.saveState();
-
-    g.setFont(
-        juce::Font(
-            "Arial",
-            12.0f,
-            juce::Font::bold));
-
-    g.setColour(
-        juce::Colours::white.withAlpha(0.82f));
-
-    g.drawText(
-        "OUT",
-        juce::roundToInt(pedalX + 5.0f),
-        juce::roundToInt(pedalY + 270.0f),
-        30,
-        55,
-        juce::Justification::centred,
-        false);
-
-    g.drawText(
-        "IN",
-        juce::roundToInt(pedalX + pedalW - 35.0f),
-        juce::roundToInt(pedalY + 270.0f),
-        30,
-        55,
-        juce::Justification::centred,
-        false);
-
-    g.restoreState();
-
-    //==========================================================
-    // CENTRAL BRANDING
+    // WHITE MAIN BORDER
     //==========================================================
 
     g.setColour(
-        juce::Colours::white.withAlpha(0.94f));
+        juce::Colours::white);
 
-    g.setFont(
-        juce::Font(
-            "Arial",
-            18.0f,
-            juce::Font::bold));
+    g.drawRoundedRectangle(
+        pedalArea.reduced(8.0f),
+        16.0f,
+        1.5f);
 
-    g.drawText(
-        "RG PRECISION DRIVE",
-        juce::roundToInt(centerX - 125.0f),
-        juce::roundToInt(pedalY + 278.0f),
-        250,
-        28,
-        juce::Justification::centred,
-        false);
+    //==========================================================
+    // INNER STEEL BORDER
+    //==========================================================
 
     g.setColour(
-        juce::Colour(50, 110, 255).withAlpha(0.75f));
+        juce::Colour(0xff6f767d));
 
-    g.fillRoundedRectangle(
-        centerX - 65.0f,
-        pedalY + 319.0f,
-        130.0f,
-        2.0f,
+    g.drawRoundedRectangle(
+        pedalArea.reduced(12.0f),
+        13.0f,
         1.0f);
 
     //==========================================================
-    // BLUE LED
-    //==========================================================
-
-    const float ledX =
-        centerX;
-
-    const float ledY =
-        pedalY + 355.0f;
-
-    const float ledRadius =
-        footswitchPressed ? 8.0f : 6.5f;
-
-    if (footswitchPressed)
-    {
-        g.setColour(
-            juce::Colour(40, 120, 255).withAlpha(0.20f));
-
-        g.fillEllipse(
-            ledX - 15.0f,
-            ledY - 15.0f,
-            30.0f,
-            30.0f);
-    }
-
-    g.setColour(
-        footswitchPressed
-            ? juce::Colour(45, 135, 255)
-            : juce::Colour(20, 45, 75));
-
-    g.fillEllipse(
-        ledX - ledRadius,
-        ledY - ledRadius,
-        ledRadius * 2.0f,
-        ledRadius * 2.0f);
-
-    g.setColour(
-        juce::Colours::white.withAlpha(
-            footswitchPressed ? 0.65f : 0.20f));
-
-    g.fillEllipse(
-        ledX - ledRadius * 0.35f,
-        ledY - ledRadius * 0.55f,
-        ledRadius * 0.45f,
-        ledRadius * 0.35f);
-
-    //==========================================================
-    // METAL FOOTSWITCH
-    //==========================================================
-
-    const float switchCX =
-        centerX;
-
-    const float switchCY =
-        pedalY + 440.0f;
-
-    const float switchRadius =
-        footswitchPressed ? 34.0f : 37.0f;
-
-    g.setColour(
-        juce::Colours::black.withAlpha(0.75f));
-
-    g.fillEllipse(
-        switchCX - switchRadius - 2.0f,
-        switchCY - switchRadius + 5.0f,
-        (switchRadius + 2.0f) * 2.0f,
-        (switchRadius + 2.0f) * 2.0f);
-
-    g.setColour(
-        juce::Colour(15, 15, 15));
-
-    g.fillEllipse(
-        switchCX - switchRadius,
-        switchCY - switchRadius,
-        switchRadius * 2.0f,
-        switchRadius * 2.0f);
-
-    juce::ColourGradient metalSwitch(
-        juce::Colour(220, 220, 220),
-        switchCX - switchRadius,
-        switchCY - switchRadius,
-
-        juce::Colour(70, 70, 70),
-        switchCX + switchRadius,
-        switchCY + switchRadius,
-        true);
-
-    g.setGradientFill(metalSwitch);
-
-    g.fillEllipse(
-        switchCX - switchRadius + 4.0f,
-        switchCY - switchRadius + 4.0f,
-        (switchRadius - 4.0f) * 2.0f,
-        (switchRadius - 4.0f) * 2.0f);
-
-    const float inner =
-        switchRadius * 0.66f;
-
-    juce::ColourGradient innerMetal(
-        juce::Colour(180, 180, 180),
-        switchCX - inner,
-        switchCY - inner,
-
-        juce::Colour(55, 55, 55),
-        switchCX + inner,
-        switchCY + inner,
-        true);
-
-    g.setGradientFill(innerMetal);
-
-    g.fillEllipse(
-        switchCX - inner,
-        switchCY - inner,
-        inner * 2.0f,
-        inner * 2.0f);
-
-    g.setColour(
-        juce::Colours::white.withAlpha(0.28f));
-
-    g.fillEllipse(
-        switchCX - inner * 0.45f,
-        switchCY - inner * 0.55f,
-        inner * 0.65f,
-        inner * 0.35f);
-
-    g.setColour(
-        juce::Colours::black.withAlpha(0.25f));
-
-    g.fillEllipse(
-        switchCX - inner * 0.18f,
-        switchCY - inner * 0.18f,
-        inner * 0.36f,
-        inner * 0.36f);
-
-    //==========================================================
-    // BOTTOM BRAND
+    // 9V — UNCHANGED
     //==========================================================
 
     g.setColour(
-        juce::Colours::white.withAlpha(0.78f));
+        juce::Colour(0xff70757c));
 
     g.setFont(
         juce::Font(
-            "Arial",
-            13.0f,
+            12.0f,
             juce::Font::bold));
 
-    g.drawText(
-        "RG ELECTRONICS",
-        juce::roundToInt(centerX - 100.0f),
-        juce::roundToInt(pedalY + 535.0f),
-        200,
-        22,
+    g.drawFittedText(
+        "9V",
+        juce::Rectangle<int>(
+            270,
+            48,
+            60,
+            18),
         juce::Justification::centred,
-        false);
-}
+        1);
 
-//==============================================================
-// MOUSE DOWN
-//==============================================================
+    //==========================================================
+    // CENTER NEGATIVE POLARITY — UNCHANGED
+    //==========================================================
 
-void RG_Precision_DriveAudioProcessorEditor::mouseDown(
-    const juce::MouseEvent& e)
-{
-    AudioProcessorEditor::mouseDown(e);
-}
+    const float polarityY =
+        69.0f;
 
-//==============================================================
-// MOUSE UP
-//==============================================================
+    const float centerX =
+        pedalCentreX;
 
-void RG_Precision_DriveAudioProcessorEditor::mouseUp(
-    const juce::MouseEvent& e)
-{
-    AudioProcessorEditor::mouseUp(e);
-}
+    g.setColour(
+        juce::Colour(0xff70757c));
 
-//==============================================================
-// TIMER
-//==============================================================
+    g.setFont(
+        juce::Font(
+            12.0f,
+            juce::Font::bold));
 
-void RG_Precision_DriveAudioProcessorEditor::timerCallback()
-{
-    gateGlowLevel =
-        juce::jlimit(
-            0.0f,
-            1.0f,
-            audioProcessor.getOutputLevel());
+    // MINUS
+    g.drawFittedText(
+        "-",
+        juce::Rectangle<int>(
+            258,
+            60,
+            18,
+            18),
+        juce::Justification::centred,
+        1);
 
-    repaint();
+    // PLUS
+    g.drawFittedText(
+        "+",
+        juce::Rectangle<int>(
+            324,
+            60,
+            18,
+            18),
+        juce::Justification::centred,
+        1);
+
+    // LEFT LINE
+    g.drawLine(
+        278.0f,
+        polarityY,
+        293.0f,
+        polarityY,
+        1.5f);
+
+    // RIGHT LINE
+    g.drawLine(
+        307.0f,
+        polarityY,
+        322.0f,
+        polarityY,
+        1.5f);
+
+    // CENTER NEGATIVE DOT
+    g.fillEllipse(
+        centerX - 5.0f,
+        polarityY - 5.0f,
+        10.0f,
+        10.0f);
+
+    //==========================================================
+    // GATE AUDIO REACTIVE HALO
+    //==========================================================
+
+    if (gateGlowLevel > 0.001f)
+    {
+        const float gateX =
+            pedalCentreX;
+
+        const float gateY =
+            339.0f;
+
+        const float intensity =
+            juce::jlimit(
+                0.0f,
+                1.0f,
+                gateGlowLevel);
+
+        g.setColour(
+            juce::Colour(
+                static_cast<juce::uint8>(
+                    20.0f
+                    + 45.0f * intensity),
+                static_cast<juce::uint8>(
+                    100.0f
+                    + 80.0f * intensity),
+                255,
+                static_cast<juce::uint8>(
+                    15.0f
+                    + 70.0f * intensity)));
+
+        g.fillEllipse(
+            gateX - 38.0f,
+            gateY - 38.0f,
+            76.0f,
+            76.0f);
+
+        g.setColour(
+            juce::Colour(
+                0x203da9ff));
+
+        g.fillEllipse(
+            gateX - 34.0f,
+            gateY - 34.0f,
+            68.0f,
+            68.0f);
+
+        g.setColour(
+            juce::Colour(
+                static_cast<juce::uint8>(
+                    40.0f
+                    + 80.0f * intensity),
+                static_cast<juce::uint8>(
+                    130.0f
+                    + 80.0f * intensity),
+                255,
+                static_cast<juce::uint8>(
+                    25.0f
+                    + 110.0f * intensity)));
+
+        g.drawEllipse(
+            gateX - 33.0f,
+            gateY - 33.0f,
+            66.0f,
+            66.0f,
+            2.0f);
+    }
+
+    //==========================================================
+    // TITLE — UNCHANGED
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0xff2494ff));
+
+    g.setFont(
+        juce::Font(
+            22.0f,
+            juce::Font::bold));
+
+    g.drawFittedText(
+        "RG PRECISION DRIVE",
+        juce::Rectangle<int>(
+            105,
+            438,
+            390,
+            32),
+        juce::Justification::centred,
+        1);
+
+    //==========================================================
+    // OUT — UNCHANGED
+    //==========================================================
+
+    g.setFont(
+        juce::Font(
+            12.0f,
+            juce::Font::bold));
+
+    g.drawFittedText(
+        "OUT",
+        juce::Rectangle<int>(
+            82,
+            438,
+            40,
+            22),
+        juce::Justification::centred,
+        1);
+
+    //==========================================================
+    // IN — UNCHANGED
+    //==========================================================
+
+    g.drawFittedText(
+        "IN",
+        juce::Rectangle<int>(
+            478,
+            438,
+            40,
+            22),
+        juce::Justification::centred,
+        1);
+
+    //==========================================================
+    // BLUE LED — UNCHANGED
+    //==========================================================
+
+    const bool fxOn =
+        !bypassButton.getToggleState();
+
+    const float ledX =
+        pedalCentreX;
+
+    const float ledY =
+        493.0f;
+
+    const float ledSize =
+        22.0f;
+
+    if (fxOn)
+    {
+        // OUTER GLOW
+        g.setColour(
+            juce::Colour(0x303da9ff));
+
+        g.fillEllipse(
+            ledX - 20.0f,
+            ledY - 20.0f,
+            40.0f,
+            40.0f);
+
+        // INNER GLOW
+        g.setColour(
+            juce::Colour(0x703da9ff));
+
+        g.fillEllipse(
+            ledX - 14.0f,
+            ledY - 14.0f,
+            28.0f,
+            28.0f);
+
+        // LED
+        g.setColour(
+            juce::Colour(0xff258cff));
+
+        g.fillEllipse(
+            ledX - ledSize * 0.5f,
+            ledY - ledSize * 0.5f,
+            ledSize,
+            ledSize);
+
+        // REFLECTION
+        g.setColour(
+            juce::Colour(0xffb9e1ff));
+
+        g.fillEllipse(
+            ledX - 4.0f,
+            ledY - 5.0f,
+            8.0f,
+            7.0f);
+    }
+    else
+    {
+        g.setColour(
+            juce::Colour(0xff101316));
+
+        g.fillEllipse(
+            ledX - ledSize * 0.5f,
+            ledY - ledSize * 0.5f,
+            ledSize,
+            ledSize);
+
+        g.setColour(
+            juce::Colour(0xff30353a));
+
+        g.drawEllipse(
+            ledX - ledSize * 0.5f,
+            ledY - ledSize * 0.5f,
+            ledSize,
+            ledSize,
+            1.0f);
+    }
+
+    //==========================================================
+    // FOOTSWITCH — UNCHANGED
+    //==========================================================
+
+    const bool pressed =
+        bypassButton.isMouseButtonDown();
+
+    const float switchX =
+        pedalCentreX;
+
+    const float switchY =
+        565.0f;
+
+    const float switchRadius =
+        45.0f;
+
+    const float centerY =
+        pressed
+            ? switchY + 5.0f
+            : switchY;
+
+    //==========================================================
+    // FIXED SHADOW
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0x90000000));
+
+    g.fillEllipse(
+        switchX - switchRadius - 4.0f,
+        switchY - switchRadius + 7.0f,
+        (switchRadius + 4.0f) * 2.0f,
+        (switchRadius + 4.0f) * 2.0f);
+
+    //==========================================================
+    // FIXED OUTER METAL RING
+    //==========================================================
+
+    juce::ColourGradient metalGradient(
+        juce::Colour(0xffeeeeee),
+        switchX - switchRadius,
+        switchY - switchRadius,
+        juce::Colour(0xff55585c),
+        switchX + switchRadius,
+        switchY + switchRadius,
+        true);
+
+    g.setGradientFill(
+        metalGradient);
+
+    g.fillEllipse(
+        switchX - switchRadius,
+        switchY - switchRadius,
+        switchRadius * 2.0f,
+        switchRadius * 2.0f);
+
+    //==========================================================
+    // FIXED DARK INNER RING
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0xff25282b));
+
+    g.fillEllipse(
+        switchX - 36.0f,
+        switchY - 36.0f,
+        72.0f,
+        72.0f);
+
+    //==========================================================
+    // MOVING METAL CENTER
+    //==========================================================
+
+    juce::ColourGradient centerMetal(
+        juce::Colour(0xffd9dcdf),
+        switchX - 27.0f,
+        centerY - 27.0f,
+        juce::Colour(0xff666a6e),
+        switchX + 27.0f,
+        centerY + 27.0f,
+        true);
+
+    g.setGradientFill(
+        centerMetal);
+
+    g.fillEllipse(
+        switchX - 28.0f,
+        centerY - 28.0f,
+        56.0f,
+        56.0f);
+
+    //==========================================================
+    // CENTER HIGHLIGHT
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0x90ffffff));
+
+    g.fillEllipse(
+        switchX - 16.0f,
+        centerY - 19.0f,
+        32.0f,
+        12.0f);
+
+    //==========================================================
+    // CENTER EDGE
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0x80666a6e));
+
+    g.drawEllipse(
+        switchX - 28.0f,
+        centerY - 28.0f,
+        56.0f,
+        56.0f,
+        1.5f);
+
+    //==========================================================
+    // BRAND — UNCHANGED
+    //==========================================================
+
+    g.setColour(
+        juce::Colour(0xff70757c));
+
+    g.setFont(
+        juce::Font(
+            14.0f,
+            juce::Font::bold));
+
+    g.drawFittedText(
+        "RG ELECTRONICS",
+        juce::Rectangle<int>(
+            150,
+            614,
+            300,
+            22),
+        juce::Justification::centred,
+        1);
 }
