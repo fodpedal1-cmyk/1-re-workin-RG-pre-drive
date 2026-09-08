@@ -225,11 +225,9 @@ void PedalKnob::paint(
             juce::Colour(0xffd9e4e8),
             cx - radius,
             cy - radius,
-
             juce::Colour(0xff526068),
             cx + radius,
             cy + radius,
-
             true);
 
         g.setGradientFill(
@@ -261,14 +259,16 @@ void PedalKnob::paint(
             radius * 0.42f,
             radius * 0.22f);
 
-        // Pointer
+        //======================================================
+        // POINTER
+        //======================================================
+
+        const float value =
+            static_cast<float>(this->getValue());
+
         const float angle =
-            juce::jmap(
-                (float)getValue(),
-                0.0f,
-                1.0f,
-                knobStartAngle,
-                knobEndAngle);
+            knobStartAngle +
+            value * (knobEndAngle - knobStartAngle);
 
         const float pointerR =
             radius * 0.72f;
@@ -297,11 +297,9 @@ void PedalKnob::paint(
         juce::Colour(0xff454545),
         cx - radius,
         cy - radius,
-
         juce::Colour(0xff050505),
         cx + radius,
         cy + radius,
-
         true);
 
     g.setGradientFill(
@@ -358,13 +356,12 @@ void PedalKnob::paint(
     // POINTER
     //==========================================================
 
+    const float value =
+        static_cast<float>(this->getValue());
+
     const float angle =
-        juce::jmap(
-            (float)getValue(),
-            0.0f,
-            1.0f,
-            knobStartAngle,
-            knobEndAngle);
+        knobStartAngle +
+        value * (knobEndAngle - knobStartAngle);
 
     const float pointerR =
         radius * 0.72f;
@@ -600,13 +597,12 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     g.setOpacity(
         0.62f);
 
-    // FIXED JUCE drawImage CALL
     g.drawImageWithin(
         orangePeelTexture,
-        pedal.getX(),
-        pedal.getY(),
-        pedal.getWidth(),
-        pedal.getHeight(),
+        static_cast<int>(pedal.getX()),
+        static_cast<int>(pedal.getY()),
+        static_cast<int>(pedal.getWidth()),
+        static_cast<int>(pedal.getHeight()),
         juce::RectanglePlacement::stretchToFit,
         false);
 
@@ -812,11 +808,8 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     // BLUE LED
     //==========================================================
 
-    const float ledX =
-        300.0f;
-
-    const float ledY =
-        482.0f;
+    const float ledX = 300.0f;
+    const float ledY = 482.0f;
 
     const float glow =
         juce::jlimit(
@@ -829,15 +822,11 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         juce::ColourGradient glowGradient(
             juce::Colours::deepskyblue.withAlpha(
                 0.38f * glow),
-
             ledX,
             ledY,
-
             juce::Colours::transparentBlack,
-
             ledX + 30.0f,
             ledY + 30.0f,
-
             true);
 
         g.setGradientFill(
@@ -864,7 +853,9 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     g.setColour(
         juce::Colours::deepskyblue.withAlpha(
             0.85f *
-            juce::jmax(0.35f, glow)));
+            juce::jmax(
+                0.35f,
+                glow)));
 
     g.fillEllipse(
         ledX - 6.0f,
@@ -886,8 +877,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     // FOOTSWITCH
     //==========================================================
 
-    const float switchCX =
-        300.0f;
+    const float switchCX = 300.0f;
 
     const float switchCY =
         footswitchPressed
@@ -919,11 +909,9 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         juce::Colour(0xffeeeeee),
         switchCX - 20.0f,
         switchCY - 25.0f,
-
         juce::Colour(0xff505050),
         switchCX + 25.0f,
         switchCY + 28.0f,
-
         true);
 
     g.setGradientFill(
