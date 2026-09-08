@@ -756,12 +756,12 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120);
 
     //==========================================================
-    // ATTACK — LOCKED POSITION
+    // ATTACK — LABEL MOVED DOWN 3 PX
     //==========================================================
 
     attackLabel.setBounds(
         92,
-        175,
+        178,
         135,
         22);
 
@@ -1151,7 +1151,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     }
 
     //==========================================================
-    // TITLE — MOVED UP 40 PX
+    // TITLE — MOVED UP TO Y = 330
     //==========================================================
 
     g.setColour(
@@ -1166,14 +1166,14 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         "RG PRECISION DRIVE",
         juce::Rectangle<int>(
             105,
-            398,
+            330,
             390,
             32),
         juce::Justification::centred,
         1);
 
     //==========================================================
-    // OUT — MOVED UP 40 PX
+    // OUT — MOVED UP TO Y = 330
     //==========================================================
 
     g.setFont(
@@ -1185,28 +1185,28 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         "OUT",
         juce::Rectangle<int>(
             82,
-            398,
+            330,
             40,
             22),
         juce::Justification::centred,
         1);
 
     //==========================================================
-    // IN — MOVED UP 40 PX
+    // IN — MOVED UP TO Y = 330
     //==========================================================
 
     g.drawFittedText(
         "IN",
         juce::Rectangle<int>(
             478,
-            398,
+            330,
             40,
             22),
         juce::Justification::centred,
         1);
 
     //==========================================================
-    // BLUE LED — MOVED UP 40 PX
+    // BLUE LED — UNCHANGED
     //==========================================================
 
     const bool fxOn =
@@ -1286,7 +1286,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     }
 
     //==========================================================
-    // FOOTSWITCH — MOVED UP 40 PX
+    // FOOTSWITCH — UNCHANGED
     // PRESS ANIMATION RETAINED
     //==========================================================
 
@@ -1405,7 +1405,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         1.5f);
 
     //==========================================================
-    // BRAND — MOVED UP 40 PX
+    // BRAND — UNCHANGED
     //==========================================================
 
     g.setColour(
