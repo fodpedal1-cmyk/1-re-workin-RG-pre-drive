@@ -756,12 +756,12 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120);
 
     //==========================================================
-    // ATTACK — LABEL MOVED DOWN 3 PX
+    // ATTACK — ORIGINAL POSITION
     //==========================================================
 
     attackLabel.setBounds(
         92,
-        178,
+        175,
         135,
         22);
 
@@ -772,7 +772,8 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120);
 
     //==========================================================
-    // GATE — LOCKED POSITION
+    // GATE — KNOB LOCKED
+    // LABEL MOVED DOWN 5 PX
     //==========================================================
 
     gateKnob.setBounds(
@@ -783,7 +784,7 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
 
     gateLabel.setBounds(
         250,
-        280,
+        285,
         102,
         22);
 
@@ -1151,7 +1152,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     }
 
     //==========================================================
-    // TITLE — MOVED UP TO Y = 330
+    // TITLE — UNCHANGED
     //==========================================================
 
     g.setColour(
@@ -1173,7 +1174,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         1);
 
     //==========================================================
-    // OUT — MOVED UP TO Y = 330
+    // OUT — UNCHANGED
     //==========================================================
 
     g.setFont(
@@ -1192,7 +1193,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         1);
 
     //==========================================================
-    // IN — MOVED UP TO Y = 330
+    // IN — UNCHANGED
     //==========================================================
 
     g.drawFittedText(
