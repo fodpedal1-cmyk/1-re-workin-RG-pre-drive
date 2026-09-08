@@ -16,7 +16,7 @@ namespace
         juce::MathConstants<float>::pi * 7.0f / 3.0f;
 
     //==========================================================
-    // PEDAL BODY — UNCHANGED
+    // PEDAL BODY — LOCKED / UNCHANGED
     //==========================================================
 
     constexpr float pedalX = 70.0f;
@@ -575,7 +575,7 @@ RG_Precision_DriveAudioProcessorEditor(
     led.setVisible(false);
 
     //==========================================================
-    // PARAMETER ATTACHMENTS
+    // PARAMETER ATTACHMENTS — UNCHANGED
     //==========================================================
 
     volumeAttachment =
@@ -720,17 +720,11 @@ void RG_Precision_DriveAudioProcessorEditor::setupLabel(
 void RG_Precision_DriveAudioProcessorEditor::resized()
 {
     //==========================================================
-    // PEDAL BODY — UNCHANGED
-    //
-    // 600 x 660 editor
-    // 460 x 610 pedal
-    //
-    // left/right black margin = 70
-    // top/bottom black margin = 25
+    // PEDAL BODY — LOCKED
     //==========================================================
 
     //==========================================================
-    // TOP ROW — MOVED UP
+    // VOLUME — LOCKED POSITION
     //==========================================================
 
     volumeLabel.setBounds(
@@ -745,6 +739,10 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120,
         120);
 
+    //==========================================================
+    // BRIGHT — LOCKED POSITION
+    //==========================================================
+
     brightLabel.setBounds(
         367,
         40,
@@ -758,7 +756,7 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120);
 
     //==========================================================
-    // MIDDLE ROW — MOVED UP
+    // ATTACK — LOCKED POSITION
     //==========================================================
 
     attackLabel.setBounds(
@@ -774,7 +772,7 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120);
 
     //==========================================================
-    // SMALL GATE — MOVED UP
+    // GATE — LOCKED POSITION
     //==========================================================
 
     gateKnob.setBounds(
@@ -790,7 +788,7 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         22);
 
     //==========================================================
-    // DRIVE — MOVED UP
+    // DRIVE — LOCKED POSITION
     //==========================================================
 
     driveLabel.setBounds(
@@ -806,12 +804,12 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         120);
 
     //==========================================================
-    // FOOTSWITCH HIT AREA — UNCHANGED
+    // FOOTSWITCH HIT AREA — MOVED WITH FOOTSWITCH
     //==========================================================
 
     bypassButton.setBounds(
         235,
-        540,
+        500,
         130,
         95);
 }
@@ -996,7 +994,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         1.0f);
 
     //==========================================================
-    // 9V — UNCHANGED
+    // 9V — LOCKED / UNCHANGED
     //==========================================================
 
     g.setColour(
@@ -1018,7 +1016,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         1);
 
     //==========================================================
-    // CENTER NEGATIVE POLARITY — UNCHANGED
+    // CENTER NEGATIVE POLARITY — LOCKED / UNCHANGED
     //==========================================================
 
     const float polarityY =
@@ -1082,15 +1080,19 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
 
     //==========================================================
     // GATE AUDIO REACTIVE HALO
+    // ALIGNED DIRECTLY TO GATE KNOB CENTER
     //==========================================================
 
     if (gateGlowLevel > 0.001f)
     {
+        const auto gateBounds =
+            gateKnob.getBounds().toFloat();
+
         const float gateX =
-            pedalCentreX;
+            gateBounds.getCentreX();
 
         const float gateY =
-            339.0f;
+            gateBounds.getCentreY();
 
         const float intensity =
             juce::jlimit(
@@ -1149,7 +1151,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     }
 
     //==========================================================
-    // TITLE — UNCHANGED
+    // TITLE — MOVED UP 40 PX
     //==========================================================
 
     g.setColour(
@@ -1164,14 +1166,14 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         "RG PRECISION DRIVE",
         juce::Rectangle<int>(
             105,
-            438,
+            398,
             390,
             32),
         juce::Justification::centred,
         1);
 
     //==========================================================
-    // OUT — UNCHANGED
+    // OUT — MOVED UP 40 PX
     //==========================================================
 
     g.setFont(
@@ -1183,28 +1185,28 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         "OUT",
         juce::Rectangle<int>(
             82,
-            438,
+            398,
             40,
             22),
         juce::Justification::centred,
         1);
 
     //==========================================================
-    // IN — UNCHANGED
+    // IN — MOVED UP 40 PX
     //==========================================================
 
     g.drawFittedText(
         "IN",
         juce::Rectangle<int>(
             478,
-            438,
+            398,
             40,
             22),
         juce::Justification::centred,
         1);
 
     //==========================================================
-    // BLUE LED — UNCHANGED
+    // BLUE LED — MOVED UP 40 PX
     //==========================================================
 
     const bool fxOn =
@@ -1214,7 +1216,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         pedalCentreX;
 
     const float ledY =
-        493.0f;
+        453.0f;
 
     const float ledSize =
         22.0f;
@@ -1284,7 +1286,8 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     }
 
     //==========================================================
-    // FOOTSWITCH — UNCHANGED
+    // FOOTSWITCH — MOVED UP 40 PX
+    // PRESS ANIMATION RETAINED
     //==========================================================
 
     const bool pressed =
@@ -1294,7 +1297,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         pedalCentreX;
 
     const float switchY =
-        565.0f;
+        525.0f;
 
     const float switchRadius =
         45.0f;
@@ -1402,7 +1405,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         1.5f);
 
     //==========================================================
-    // BRAND — UNCHANGED
+    // BRAND — MOVED UP 40 PX
     //==========================================================
 
     g.setColour(
@@ -1417,7 +1420,7 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         "RG ELECTRONICS",
         juce::Rectangle<int>(
             150,
-            614,
+            574,
             300,
             22),
         juce::Justification::centred,
