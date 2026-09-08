@@ -65,10 +65,6 @@ void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
                    bounds.getHeight()) * 0.5f
         - 2.0f;
 
-    //==========================================================
-    // CRYSTAL / GATE KNOB
-    //==========================================================
-
     if (smallKnob)
     {
         juce::ColourGradient crystal(
@@ -108,7 +104,6 @@ void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
             radius * 1.16f,
             radius * 1.16f);
 
-        // Pointer
         const float value =
             (float)getValue();
 
@@ -132,10 +127,6 @@ void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
         return;
     }
 
-    //==========================================================
-    // MAIN METAL KNOB
-    //==========================================================
-
     juce::ColourGradient metal(
         juce::Colours::grey.brighter(0.55f),
         cx - radius,
@@ -154,7 +145,6 @@ void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
         radius * 2.0f,
         radius * 2.0f);
 
-    // Outer edge
     g.setColour(
         juce::Colours::black);
 
@@ -165,7 +155,6 @@ void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
         radius * 2.0f,
         2.0f);
 
-    // Inner ring
     const float innerRadius =
         radius * 0.78f;
 
@@ -179,7 +168,6 @@ void RG_Precision_DriveAudioProcessorEditor::PedalKnob::paint(
         innerRadius * 2.0f,
         1.2f);
 
-    // Pointer
     const float value =
         (float)getValue();
 
@@ -211,16 +199,8 @@ RG_Precision_DriveAudioProcessorEditor(
     : AudioProcessorEditor(&p),
       audioProcessor(p)
 {
-    //==========================================================
-    // WINDOW SIZE
-    //==========================================================
-
     setSize(600, 660);
     setResizable(false, false);
-
-    //==========================================================
-    // KNOBS
-    //==========================================================
 
     setupKnob(
         volumeKnob,
@@ -243,19 +223,11 @@ RG_Precision_DriveAudioProcessorEditor(
         gateKnob,
         juce::Slider::RotaryHorizontalVerticalDrag);
 
-    //==========================================================
-    // LABELS — ONE LABEL EACH
-    //==========================================================
-
     setupLabel(volumeLabel, "VOLUME");
     setupLabel(brightLabel, "BRIGHT");
     setupLabel(attackLabel, "ATTACK");
     setupLabel(driveLabel, "DRIVE");
     setupLabel(gateLabel, "GATE");
-
-    //==========================================================
-    // BYPASS / FOOTSWITCH
-    //==========================================================
 
     bypassButton.setButtonText({});
     bypassButton.setClickingTogglesState(true);
@@ -272,10 +244,6 @@ RG_Precision_DriveAudioProcessorEditor(
         };
 
     addAndMakeVisible(bypassButton);
-
-    //==========================================================
-    // PARAMETER ATTACHMENTS
-    //==========================================================
 
     volumeAttachment =
         std::make_unique<
@@ -319,10 +287,6 @@ RG_Precision_DriveAudioProcessorEditor(
                 "BYPASS",
                 bypassButton);
 
-    //==========================================================
-    // LED
-    //==========================================================
-
     led.setText(
         {},
         juce::dontSendNotification);
@@ -356,6 +320,7 @@ void RG_Precision_DriveAudioProcessorEditor::setupKnob(
     bool selector)
 {
     knob.setSliderStyle(style);
+
     knob.setTextBoxStyle(
         juce::Slider::NoTextBox,
         false,
@@ -426,10 +391,6 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
     const float editorH =
         (float)getHeight();
 
-    //==========================================================
-    // PEDAL
-    //==========================================================
-
     const float pedalW = 350.0f;
     const float pedalH = 590.0f;
 
@@ -447,10 +408,6 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
 
     const float rightX =
         pedalX + pedalW * 0.715f;
-
-    //==========================================================
-    // TOP ROW
-    //==========================================================
 
     const int topSize = 78;
 
@@ -477,10 +434,6 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         juce::roundToInt(pedalY + 148.0f),
         96,
         20);
-
-    //==========================================================
-    // SECOND ROW
-    //==========================================================
 
     const int mainSize = 72;
 
@@ -522,17 +475,12 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
         96,
         20);
 
-    //==========================================================
-    // FOOTSWITCH CLICK AREA
-    //==========================================================
-
     bypassButton.setBounds(
         juce::roundToInt(centerX - 65.0f),
         juce::roundToInt(pedalY + 415.0f),
         130,
         115);
 
-    // LED component is only used as the indicator anchor.
     led.setBounds(
         juce::roundToInt(centerX - 16.0f),
         juce::roundToInt(pedalY + 338.0f),
@@ -546,7 +494,6 @@ void RG_Precision_DriveAudioProcessorEditor::resized()
 
 void RG_Precision_DriveAudioProcessorEditor::updateLED()
 {
-    // The LED itself is drawn in paint().
     repaint();
 }
 
@@ -557,10 +504,6 @@ void RG_Precision_DriveAudioProcessorEditor::updateLED()
 void RG_Precision_DriveAudioProcessorEditor::paint(
     juce::Graphics& g)
 {
-    //==========================================================
-    // BACKGROUND
-    //==========================================================
-
     g.fillAll(
         juce::Colour(18, 18, 18));
 
@@ -578,6 +521,13 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
 
     const float pedalY =
         (editorH - pedalH) * 0.5f;
+
+    //==========================================================
+    // FIX: CENTER X
+    //==========================================================
+
+    const float centerX =
+        pedalX + pedalW * 0.5f;
 
     //==========================================================
     // PEDAL SHADOW
@@ -631,7 +581,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
             juce::roundToInt(pedalW - 6.0f),
             juce::roundToInt(pedalH - 6.0f)));
 
-    // Dark pits
     for (int i = 0; i < 1200; ++i)
     {
         const float x =
@@ -654,7 +603,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
             r);
     }
 
-    // Raised particles
     for (int i = 0; i < 1400; ++i)
     {
         const float x =
@@ -709,7 +657,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     g.setColour(
         juce::Colours::white.withAlpha(0.82f));
 
-    // OUT — left side, vertical
     g.drawText(
         "OUT",
         juce::roundToInt(pedalX + 5.0f),
@@ -719,7 +666,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         juce::Justification::centred,
         false);
 
-    // IN — right side, vertical
     g.drawText(
         "IN",
         juce::roundToInt(pedalX + pedalW - 35.0f),
@@ -753,7 +699,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         juce::Justification::centred,
         false);
 
-    // Small blue accent
     g.setColour(
         juce::Colour(50, 110, 255).withAlpha(0.75f));
 
@@ -823,7 +768,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
     const float switchRadius =
         footswitchPressed ? 34.0f : 37.0f;
 
-    // Shadow
     g.setColour(
         juce::Colours::black.withAlpha(0.75f));
 
@@ -833,7 +777,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         (switchRadius + 2.0f) * 2.0f,
         (switchRadius + 2.0f) * 2.0f);
 
-    // Outer ring
     g.setColour(
         juce::Colour(15, 15, 15));
 
@@ -843,7 +786,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         switchRadius * 2.0f,
         switchRadius * 2.0f);
 
-    // Metal body
     juce::ColourGradient metalSwitch(
         juce::Colour(220, 220, 220),
         switchCX - switchRadius,
@@ -862,7 +804,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         (switchRadius - 4.0f) * 2.0f,
         (switchRadius - 4.0f) * 2.0f);
 
-    // Inner face
     const float inner =
         switchRadius * 0.66f;
 
@@ -884,7 +825,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         inner * 2.0f,
         inner * 2.0f);
 
-    // Highlight
     g.setColour(
         juce::Colours::white.withAlpha(0.28f));
 
@@ -894,7 +834,6 @@ void RG_Precision_DriveAudioProcessorEditor::paint(
         inner * 0.65f,
         inner * 0.35f);
 
-    // Center
     g.setColour(
         juce::Colours::black.withAlpha(0.25f));
 
