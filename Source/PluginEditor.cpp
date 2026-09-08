@@ -23,7 +23,7 @@ namespace
     constexpr int editorH = 660;
 
     //==========================================================
-    // PEDAL BODY — HORIZON STYLE PROPORTION
+    // PEDAL BODY
     //==========================================================
 
     constexpr float pedalX = 125.0f;
@@ -47,18 +47,22 @@ namespace
 
         juce::Graphics tg(img);
 
-        tg.fillAll(juce::Colour(0xff202020));
+        tg.fillAll(
+            juce::Colour(0xff202020));
 
         juce::Random r(0x7A31C9E5);
 
         //======================================================
-        // LARGE ORANGE-PEEL PITS
+        // LARGE PITS
         //======================================================
 
         for (int i = 0; i < 9000; ++i)
         {
-            const float x = r.nextFloat() * 700.0f;
-            const float y = r.nextFloat() * 1000.0f;
+            const float x =
+                r.nextFloat() * 700.0f;
+
+            const float y =
+                r.nextFloat() * 1000.0f;
 
             const float s =
                 0.25f + r.nextFloat() * 1.8f;
@@ -78,13 +82,16 @@ namespace
         }
 
         //======================================================
-        // SMALL RAISED BUMPS
+        // SMALL BUMPS
         //======================================================
 
         for (int i = 0; i < 7500; ++i)
         {
-            const float x = r.nextFloat() * 700.0f;
-            const float y = r.nextFloat() * 1000.0f;
+            const float x =
+                r.nextFloat() * 700.0f;
+
+            const float y =
+                r.nextFloat() * 1000.0f;
 
             const float s =
                 0.15f + r.nextFloat() * 1.1f;
@@ -109,8 +116,11 @@ namespace
 
         for (int i = 0; i < 4500; ++i)
         {
-            const float x = r.nextFloat() * 700.0f;
-            const float y = r.nextFloat() * 1000.0f;
+            const float x =
+                r.nextFloat() * 700.0f;
+
+            const float y =
+                r.nextFloat() * 1000.0f;
 
             tg.setColour(
                 juce::Colour(
@@ -206,7 +216,7 @@ void PedalKnob::paint(
         radius * 2.0f);
 
     //==========================================================
-    // GATE — SMALL CRYSTAL KNOB
+    // GATE CRYSTAL KNOB
     //==========================================================
 
     if (isGate)
@@ -222,7 +232,8 @@ void PedalKnob::paint(
 
             true);
 
-        g.setGradientFill(crystal);
+        g.setGradientFill(
+            crystal);
 
         g.fillEllipse(
             cx - radius,
@@ -230,7 +241,6 @@ void PedalKnob::paint(
             radius * 2.0f,
             radius * 2.0f);
 
-        // Dark crystal inner ring
         g.setColour(
             juce::Colours::black.withAlpha(0.55f));
 
@@ -294,7 +304,8 @@ void PedalKnob::paint(
 
         true);
 
-    g.setGradientFill(knobGradient);
+    g.setGradientFill(
+        knobGradient);
 
     g.fillEllipse(
         cx - radius,
@@ -391,7 +402,7 @@ RG_PrecisionDriveAudioProcessorEditor(
         false);
 
     //==========================================================
-    // CREATE KNOBS
+    // KNOBS
     //==========================================================
 
     addAndMakeVisible(volumeKnob);
@@ -400,22 +411,27 @@ RG_PrecisionDriveAudioProcessorEditor(
     addAndMakeVisible(gateKnob);
     addAndMakeVisible(driveKnob);
 
-    gateKnob.setComponentID("GATE");
+    gateKnob.setComponentID(
+        "GATE");
 
     //==========================================================
-    // BYPASS BUTTON
+    // BYPASS
     //==========================================================
 
-    addAndMakeVisible(bypassButton);
+    addAndMakeVisible(
+        bypassButton);
 
-    bypassButton.setButtonText("");
+    bypassButton.setButtonText(
+        "");
 
-    bypassButton.setClickingTogglesState(true);
+    bypassButton.setClickingTogglesState(
+        true);
 
-    bypassButton.setAlpha(0.001f);
+    bypassButton.setAlpha(
+        0.001f);
 
     //==========================================================
-    // PARAMETER ATTACHMENTS
+    // ATTACHMENTS
     //==========================================================
 
     volumeAttachment =
@@ -484,17 +500,7 @@ RG_PrecisionDriveAudioProcessorEditor::
 void RG_PrecisionDriveAudioProcessorEditor::resized()
 {
     //==========================================================
-    // PEDAL COORDINATE SYSTEM
-    //
-    // Body:
-    // X = 125
-    // Y = 35
-    // W = 350
-    // H = 590
-    //==========================================================
-
-    //==========================================================
-    // TOP ROW
+    // TOP CONTROLS
     //==========================================================
 
     volumeKnob.setBounds(
@@ -510,7 +516,7 @@ void RG_PrecisionDriveAudioProcessorEditor::resized()
         95);
 
     //==========================================================
-    // ATTACK / GATE / DRIVE
+    // MIDDLE CONTROLS
     //==========================================================
 
     attackKnob.setBounds(
@@ -550,14 +556,14 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     juce::Graphics& g)
 {
     //==========================================================
-    // PURE BLACK OUTSIDE PEDAL
+    // BLACK BACKGROUND
     //==========================================================
 
     g.fillAll(
         juce::Colours::black);
 
     //==========================================================
-    // PEDAL BODY
+    // PEDAL RECTANGLE
     //==========================================================
 
     auto pedal =
@@ -568,7 +574,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
             pedalH);
 
     //==========================================================
-    // DARK GUNMETAL BASE
+    // BASE
     //==========================================================
 
     g.setColour(
@@ -579,7 +585,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         5.0f);
 
     //==========================================================
-    // ORANGE PEEL TEXTURE
+    // TEXTURE
     //==========================================================
 
     if (orangePeelTexture.isNull())
@@ -591,17 +597,23 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     g.reduceClipRegion(
         pedal.toNearestInt());
 
-    g.setOpacity(0.62f);
+    g.setOpacity(
+        0.62f);
 
-    g.drawImage(
+    // FIXED JUCE drawImage CALL
+    g.drawImageWithin(
         orangePeelTexture,
-        pedal.toNearestInt(),
-        juce::RectanglePlacement::stretchToFit);
+        pedal.getX(),
+        pedal.getY(),
+        pedal.getWidth(),
+        pedal.getHeight(),
+        juce::RectanglePlacement::stretchToFit,
+        false);
 
     g.restoreState();
 
     //==========================================================
-    // OUTER PEDAL BORDER
+    // OUTER BORDER
     //==========================================================
 
     g.setColour(
@@ -613,7 +625,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         6.0f);
 
     //==========================================================
-    // INNER METAL BORDER
+    // INNER BORDER
     //==========================================================
 
     auto inner =
@@ -643,7 +655,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         1.0f);
 
     //==========================================================
-    // 9V / POLARITY MARKING
+    // 9V
     //==========================================================
 
     g.setColour(
@@ -671,7 +683,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         juce::Justification::centred);
 
     //==========================================================
-    // CONTROL LABELS
+    // LABELS
     //==========================================================
 
     g.setColour(
@@ -715,7 +727,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         juce::Justification::centred);
 
     //==========================================================
-    // GATE LABEL
+    // GATE
     //==========================================================
 
     g.setColour(
@@ -735,7 +747,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         juce::Justification::centred);
 
     //==========================================================
-    // GATE CRYSTAL HALO
+    // GATE HALO
     //==========================================================
 
     g.setColour(
@@ -749,7 +761,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         1.0f);
 
     //==========================================================
-    // TITLE
+    // PRODUCT NAME
     //==========================================================
 
     g.setColour(
@@ -769,7 +781,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         juce::Justification::centred);
 
     //==========================================================
-    // INPUT / OUTPUT
+    // IN / OUT
     //==========================================================
 
     g.setFont(
@@ -800,25 +812,29 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     // BLUE LED
     //==========================================================
 
-    const float ledX = 300.0f;
-    const float ledY = 482.0f;
+    const float ledX =
+        300.0f;
 
-    float glow =
+    const float ledY =
+        482.0f;
+
+    const float glow =
         juce::jlimit(
             0.0f,
             1.0f,
             gateGlowLevel);
 
-    // Outer glow
     if (glow > 0.01f)
     {
         juce::ColourGradient glowGradient(
             juce::Colours::deepskyblue.withAlpha(
                 0.38f * glow),
+
             ledX,
             ledY,
 
             juce::Colours::transparentBlack,
+
             ledX + 30.0f,
             ledY + 30.0f,
 
@@ -834,7 +850,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
             50.0f);
     }
 
-    // LED body
+    // LED black surround
     g.setColour(
         juce::Colours::black);
 
@@ -844,9 +860,11 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         18.0f,
         18.0f);
 
+    // LED
     g.setColour(
         juce::Colours::deepskyblue.withAlpha(
-            0.85f * juce::jmax(0.35f, glow)));
+            0.85f *
+            juce::jmax(0.35f, glow)));
 
     g.fillEllipse(
         ledX - 6.0f,
@@ -854,6 +872,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         12.0f,
         12.0f);
 
+    // LED highlight
     g.setColour(
         juce::Colours::white.withAlpha(0.55f));
 
@@ -867,9 +886,10 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
     // FOOTSWITCH
     //==========================================================
 
-    const float switchCX = 300.0f;
+    const float switchCX =
+        300.0f;
 
-    float switchCY =
+    const float switchCY =
         footswitchPressed
             ? 563.0f
             : 557.0f;
@@ -894,7 +914,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         64.0f,
         64.0f);
 
-    // Metal gradient
+    // Metal
     juce::ColourGradient metal(
         juce::Colour(0xffeeeeee),
         switchCX - 20.0f,
@@ -915,7 +935,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         50.0f,
         50.0f);
 
-    // Inner dark ring
+    // Inner ring
     g.setColour(
         juce::Colour(0xff262626));
 
@@ -926,7 +946,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         40.0f,
         2.0f);
 
-    // Center highlight
+    // Highlight
     g.setColour(
         juce::Colours::white.withAlpha(0.32f));
 
@@ -937,7 +957,7 @@ void RG_PrecisionDriveAudioProcessorEditor::paint(
         9.0f);
 
     //==========================================================
-    // BRAND
+    // RG ELECTRONICS
     //==========================================================
 
     g.setColour(
